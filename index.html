@@ -1,0 +1,176 @@
+import telebot
+from telebot import types
+import os
+import json
+
+TOKEN = os.environ.get("BOT_TOKEN")
+ADMIN = int(os.environ.get("ADMIN_ID"))
+WEBAPP_URL = "https://show-site.onrender.com/app"
+
+bot = telebot.TeleBot(TOKEN)
+
+SERVICES = {
+    "💇 Стрижка и укладка": "от 1500₽",
+    "💅 Маникюр": "от 1200₽",
+    "💆 Уход за лицом": "от 2000₽",
+    "🎨 Окрашивание": "от 3000₽",
+    "👁 Брови и ресницы": "от 800₽",
+}
+
+user_data = {}
+
+# ---------- ГЛАВНОЕ МЕНЮ ----------
+def main_menu():
+    kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add(types.KeyboardButton(
+        "✨ Записаться (приложение)",
+        web_app=types.WebAppInfo(WEBAPP_URL)
+    ))
+    kb.row("💅 Услуги и цены", "📍 Контакты")
+    kb.row("ℹ️ О нас", "📝 Быстрая заявка")
+    return kb
+
+# ---------- СТАРТ ----------
+@bot.message_handler(commands=["start"])
+def start(m):
+    bot.send_message(
+        m.chat.id,
+        f"✨ <b>Студия красоты «Аура»</b> ✨\n\n"
+        f"Привет, {m.from_user.first_name}! 👋\n"
+        f"Я помогу записаться на процедуры.\n\n"
+        f"Выбери действие 👇",
+        parse_mode="HTML",
+        reply_markup=main_menu()
+    )
+
+# ---------- УСЛУГИ ----------
+@bot.message_handler(func=lambda m: m.text == "💅 Услуги и цены")
+def services(m):
+    text = "💅 <b>Наши услуги:</b>\n\n"
+    for name, price in SERVICES.items():
+        text += f"{name} — <b>{price}</b>\n"
+    bot.send_message(m.chat.id, text, parse_mode="HTML")
+
+# ---------- КОНТАКТЫ ----------
+@bot.message_handler(func=lambda m: m.text == "📍 Контакты")
+def contacts(m):
+    bot.send_message(
+        m.chat.id,
+        "📍 <b>Контакты студии «Аура»</b>\n\n"
+        "🏠 Адрес: г. Москва, ул. Красоты, 12\n"
+        "📞 Телефон: +7 (900) 000-00-00\n"
+        "🕐 Часы работы: 9:00 – 21:00\n"
+        "🌐 Сайт: chel5252.github.io",
+        parse_mode="HTML"
+    )
+
+# ---------- О НАС ----------
+@bot.message_handler(func=lambda m: m.text == "ℹ️ О нас")
+def about(m):
+    bot.send_message(
+        m.chat.id,
+        "✨ <b>О студии «Аура»</b>\n\n"
+        "Мы — команда профессионалов с опытом более 10 лет. "
+        "Используем премиальную косметику и следим за трендами. "
+        "Твоя красота — наша забота! 💖",
+        parse_mode="HTML"
+    )
+
+# ---------- БЫСТРАЯ ЗАЯВКА ----------
+@bot.message_handler(func=lambda m: m.text == "📝 Быстрая заявка")
+def quick_start(m):
+    user_data[m.chat.id] = {}
+    msg = bot.send_message(m.chat.id, "👤 Как вас зовут?")
+    bot.register_next_step_handler(msg, get_name)
+
+def get_name(m):
+    if m.chat.id not in user_data:
+        user_data[m.chat.id] = {}
+    user_data[m.chat.id]["name"] = m.text
+    msg = bot.send_message(m.chat.id, "📞 Ваш телефон?")
+    bot.register_next_step_handler(msg, get_phone)
+
+def get_phone(m):
+    user_data[m.chat.id]["phone"] = m.text
+    kb = types.InlineKeyboardMarkup()
+    for name in SERVICES:
+        kb.add(types.InlineKeyboardButton(name, callback_data=f"srv|{name}"))
+    bot.send_message(m.chat.id, "💅 Выберите услугу:", reply_markup=kb)
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("srv|"))
+def get_service(c):
+    chat_id = c.message.chat.id
+    if chat_id not in user_data:
+        user_data[chat_id] = {}
+    service = c.data.split("|")[1]
+    user_data[chat_id]["service"] = service
+    bot.answer_callback_query(c.id, f"Выбрано: {service}")
+    msg = bot.send_message(chat_id, "🕐 Удобные дата и время?")
+    bot.register_next_step_handler(msg, get_time)
+
+def get_time(m):
+    chat_id = m.chat.id
+    if chat_id not in user_data:
+        bot.send_message(chat_id, "⚠️ Начните заново — нажмите «Быстрая заявка»", reply_markup=main_menu())
+        return
+    d = user_data[chat_id]
+    d["datetime"] = m.text
+    bot.send_message(
+        ADMIN,
+        f"🔔 <b>НОВАЯ ЗАЯВКА ИЗ БОТА!</b>\n\n"
+        f"👤 Имя: {d.get('name','?')}\n"
+        f"📞 Телефон: {d.get('phone','?')}\n"
+        f"💅 Услуга: {d.get('service','?')}\n"
+        f"🕐 Время: {d['datetime']}\n"
+        f"🆔 От: @{m.from_user.username or 'нет'}",
+        parse_mode="HTML"
+    )
+    bot.send_message(
+        chat_id,
+        "✅ <b>Заявка принята!</b>\nМы перезвоним для подтверждения 💖",
+        parse_mode="HTML",
+        reply_markup=main_menu()
+    )
+    user_data.pop(chat_id, None)
+
+# ---------- ПРИЁМ ДАННЫХ ИЗ MINI APP ----------
+@bot.message_handler(content_types=["web_app_data"])
+def webapp_data(m):
+    d = json.loads(m.web_app_data.data)
+    bot.send_message(
+        ADMIN,
+        f"🔔 <b>ЗАЯВКА ИЗ MINI APP!</b>\n\n"
+        f"👤 Имя: {d['name']}\n"
+        f"📞 Телефон: {d['phone']}\n"
+        f"💅 Услуга: {d['service']}\n"
+        f"🕐 Время: {d['datetime']}\n"
+        f"🆔 От: @{m.from_user.username or 'нет'}",
+        parse_mode="HTML"
+    )
+    bot.send_message(
+        m.chat.id,
+        "✅ <b>Заявка из приложения принята!</b> 💖",
+        parse_mode="HTML"
+    )
+
+# ---------- МИНИ ВЕБ-СЕРВЕР ДЛЯ RENDER ----------
+from flask import Flask
+from threading import Thread
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Бот работает ✅"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+def run_bot():
+    print("Бот запущен ✅")
+    bot.infinity_polling()
+
+# Запускаем веб-сервер в фоне, а бота — основным потоком
+Thread(target=run_web).start()
+run_bot()
