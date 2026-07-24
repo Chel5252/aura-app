@@ -1,54 +1,114 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Аура — запись</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif; }
-  body {
-    background:linear-gradient(160deg,#1a1625,#2a1f3d);
-    color:#fff; min-height:100vh;
-    display:flex; align-items:center; justify-content:center;
-    padding:20px;
-  }
-  .card {
-    width:100%; max-width:440px;
-    background:rgba(45,38,64,0.55);
-    backdrop-filter:blur(12px);
-    border:1px solid rgba(168,85,247,0.25);
-    border-radius:24px;
-    padding:32px 26px;
-    box-shadow:0 20px 60px rgba(168,85,247,0.25);
-  }
-  h1 {
-    text-align:center; margin-bottom:8px; font-size:26px;
-    background:linear-gradient(90deg,#a855f7,#ec4899);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  }
-  p.sub { text-align:center; color:#b3aac2; margin-bottom:26px; font-size:14px; }
-  label { display:block; margin:16px 0 7px; font-weight:600; font-size:14px; color:#e5ddf0; }
-  input, select {
-    width:100%; padding:14px 16px; border:1px solid rgba(255,255,255,0.08);
-    border-radius:14px; background:rgba(26,22,37,0.6); color:#fff; font-size:15px;
-    transition:0.25s;
-  }
-  input::placeholder { color:#7d7590; }
-  input:focus, select:focus {
-    outline:none; border-color:#a855f7;
-    box-shadow:0 0 0 4px rgba(168,85,247,0.15);
-  }
-  button {
-    width:100%; padding:16px; margin-top:28px; border:none;
-    border-radius:16px; font-size:16px; font-weight:700; color:#fff;
-    background:linear-gradient(90deg,#a855f7,#ec4899); cursor:pointer;
-    transition:0.25s; box-shadow:0 8px 24px rgba(236,72,153,0.35);
-  }
-  button:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(236,72,153,0.5); }
-  button:active { transform:translateY(0); opacity:0.9; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Аура — запись</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(160deg, #1a1625, #2a1f3d);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(45, 38, 64, 0.55);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 24px;
+      padding: 32px 26px;
+      box-shadow: 0 20px 60px rgba(168, 85, 247, 0.25);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 26px;
+      background: linear-gradient(90deg, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.sub {
+      text-align: center;
+      color: #b3aac2;
+      margin-bottom: 26px;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #e5ddf0;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: rgba(26, 22, 37, 0.6);
+      color: #fff;
+      font-size: 15px;
+      transition: 0.25s;
+    }
+
+    input::placeholder {
+      color: #7d7590;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #a855f7;
+      box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 28px;
+      border: none;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(90deg, #a855f7, #ec4899);
+      cursor: pointer;
+      transition: 0.25s;
+      box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(236, 72, 153, 0.5);
+    }
+
+    button:active {
+      transform: translateY(0);
+      opacity: 0.9;
+    }
+  </style>
 </head>
+
 <body>
   <div class="card">
     <h1>✨ Запишитесь онлайн</h1>
@@ -58,7 +118,7 @@
     <input id="name" placeholder="Александров Леон">
 
     <label>Телефон</label>
-    <input id="phone" type="tel" placeholder="+7 900 000 00 00">
+    <input id="phone" type="tel" inputmode="numeric" placeholder="+7 (900) 000-00-00" maxlength="18">
 
     <label>Услуга</label>
     <select id="service">
@@ -69,31 +129,60 @@
       <option>👁 Брови и ресницы</option>
     </select>
 
-    <label>Удобные дата и время</label>
-    <input id="datetime" placeholder="12 января, 15:00">
+    <label>Дата записи</label>
+    <input id="date" type="date">
+
+    <label>Время записи</label>
+    <input id="time" type="time">
 
     <button onclick="send()">Отправить заявку 💜</button>
   </div>
 
-<script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
-  tg.MainButton.hide();
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.MainButton.hide();
 
-  function send() {
-    const data = {
-      name: document.getElementById('name').value,
-      phone: document.getElementById('phone').value,
-      service: document.getElementById('service').value,
-      datetime: document.getElementById('datetime').value
-    };
-    if (!data.name || !data.phone || !data.datetime) {
-      tg.showAlert('Заполните все поля!');
-      return;
+    // --- Автоформат телефона: только цифры ---
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', function () {
+      let digits = this.value.replace(/\D/g, ''); // убираем всё, кроме цифр
+
+      if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+      if (!digits.startsWith('7')) digits = '7' + digits;
+      digits = digits.slice(0, 11); // максимум 11 цифр
+
+      let formatted = '+7';
+      if (digits.length > 1) formatted += ' (' + digits.slice(1, 4);
+      if (digits.length >= 5) formatted += ') ' + digits.slice(4, 7);
+      if (digits.length >= 8) formatted += '-' + digits.slice(7, 9);
+      if (digits.length >= 10) formatted += '-' + digits.slice(9, 11);
+
+      this.value = formatted;
+    });
+
+    function send() {
+      const phone = document.getElementById('phone').value;
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        phone: phone,
+        service: document.getElementById('service').value,
+        datetime: date + ' ' + time
+      };
+
+      // Проверки
+      if (!data.name) {tg.showAlert('Введите ваше имя!'); return;}
+      if (phone.replace(/\D/g, '').length < 11) {tg.showAlert('Введите корректный номер телефона!'); return;}
+      if (!date) {tg.showAlert('Выберите дату записи!'); return;}
+      if (!time) {tg.showAlert('Выберите время записи!'); return;}
+
+      tg.sendData(JSON.stringify(data));
+      tg.close();
     }
-    tg.sendData(JSON.stringify(data));
-    tg.close();
-  }
-</script>
+  </script>
 </body>
+
 </html>
