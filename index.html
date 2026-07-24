@@ -146,11 +146,10 @@
     // --- Автоформат телефона: только цифры ---
     const phoneInput = document.getElementById('phone');
     phoneInput.addEventListener('input', function () {
-      let digits = this.value.replace(/\D/g, ''); // убираем всё, кроме цифр
-
+      let digits = this.value.replace(/\D/g, '');
       if (digits.startsWith('8')) digits = '7' + digits.slice(1);
       if (!digits.startsWith('7')) digits = '7' + digits;
-      digits = digits.slice(0, 11); // максимум 11 цифр
+      digits = digits.slice(0, 11);
 
       let formatted = '+7';
       if (digits.length > 1) formatted += ' (' + digits.slice(1, 4);
@@ -173,7 +172,6 @@
         datetime: date + ' ' + time
       };
 
-      // Проверки
       if (!data.name) {tg.showAlert('Введите ваше имя!'); return;}
       if (phone.replace(/\D/g, '').length < 11) {tg.showAlert('Введите корректный номер телефона!'); return;}
       if (!date) {tg.showAlert('Выберите дату записи!'); return;}
